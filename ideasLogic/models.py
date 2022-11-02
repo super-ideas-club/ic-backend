@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 # TODO: Мб перенести в useres
-from users.models import Person
+from users.models import Person, User
 
 
 class UserSkill(models.Model):
@@ -58,13 +58,39 @@ class Idea(models.Model):
     wanted_skills = models.ManyToManyField(to=UserSkill,
                                            verbose_name="Требуемые скиллы")
 
-    main_theme = models.ForeignKey(to=IdeaTheme,
-                                   on_delete=models.SET_NULL,
-                                   null=True,
-                                   blank=True,
-                                   verbose_name="Тема")
 
-    # team = models.ForeignKey()
+    # поменять
+    themes = models.ManyToManyField(to=IdeaTheme,
+                                    null=True,
+                                    blank=True,
+                                    verbose_name="Темаы")
+
+    # скрыта
+    hidden = models.BooleanField(default=True, verbose_name="Скрыто")
+
 
     def __str__(self):
         return self.short_name
+
+    def team(self):
+        return Team.objects.get(idea=self.pk)
+
+
+class Team(models.Model):
+    persons = models.ManyToManyField(to=Person,
+                                     verbose_name="Состав команды")
+    name = models.CharField(max_length=70,
+                            verbose_name="Название команды")
+    wanted_skills = models.ManyToManyField(to=UserSkill,
+                                           verbose_name="Требуемые скиллы")
+    idea = models.ForeignKey(to=Idea,
+                             on_delete=models.CASCADE,
+                             verbose_name="Идея")
+    description = models.TextField(verbose_name="Описание")
+    created_by = models.ForeignKey(to=User,
+                                   on_delete=models.CASCADE,
+                                   verbose_name="Создатель",
+                                   editable=False)
+
+    def __str__(self):
+        return f"{self.name} {self.idea}"

@@ -10,4 +10,5 @@ schema_view = get_schema_view(title="Example API")
 urlpatterns = [
     path('ideas/', include("ideasLogic.ideas_api")),
     path('user-skill/', include("ideasLogic.user_skill_api")),
+    path('team/', include('ideasLogic.team_api'))
 ]

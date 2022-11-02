@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+from django.db.models import When
 from django.http import JsonResponse
 from rest_framework import serializers, status
 from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404, GenericAPIView, RetrieveAPIView, \
@@ -19,7 +21,8 @@ class IdeaThemeSerializer(serializers.ModelSerializer):
 class IdeaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Idea
-        fields = ('pk', 'short_name', 'description', 'state', 'main_theme', 'wanted_skills', )
+        fields = ('pk', 'short_name', 'description', 'state', 'themes', 'wanted_skills', 'hidden')
+        depth = 1
         extra_kwargs = {
             'state': {
                 'read_only': True
@@ -58,6 +61,7 @@ class IdeaThemeCreate(CreateAPIView):
 class IdeaCreate(CreateAPIView):
     """
     Работает
+
     """
     schema = AutoSchema(tags=["Idea"])
     serializer_class = IdeaSerializer
@@ -80,9 +84,43 @@ class IdeaGetDelete(RetrieveAPIView, DestroyAPIView, UpdateAPIView):
     queryset = Idea.objects.all()
 
 
+class IdeasList(ListAPIView):
+    """
+    Работает!
+    Выдает список откртых идей по конкретному пользователю
+
+    Если пользотель запрашивает свои идеи (или это администратор) то выдает в том числе скрытые идеи
+    """
+
+    serializer_class = IdeaSerializer
+    schema = AutoSchema(tags=["Team"], operation_id_base="ideas list by user")
+
+    def get_queryset(self):
+        from ideasLogic.models import Team
+        needed_user = self.kwargs['user_id']
+        users_teams = Team.objects.filter(persons__user=needed_user)
+        print(users_teams)
+        query_set = Idea.objects.filter(team__in=users_teams)
+
+        all_users_in_teams = users_teams.values_list('persons')
+        print(all_users_in_teams)
+
+        try:
+            user = self.request.user
+            res = When(user__in=all_users_in_teams, then=True)
+            if not (user.is_staff or res):
+                query_set = query_set.filter(hidden=False)
+        except User.DoesNotExist:
+            pass
+            query_set = query_set.filter(hidden=False)
+
+        return query_set
+
+
 urlpatterns = [
     path('themes/all', IdeaThemeList.as_view(), name='idea_theme_all'),
     path('themes/create', IdeaThemeCreate.as_view(), name='create_idea_theme'),
     path('create', IdeaCreate.as_view()),
+    path('list/<int:user_id>', IdeasList.as_view()),
     path('<int:pk>', IdeaGetDelete.as_view())
 ]
