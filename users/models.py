@@ -95,13 +95,15 @@ class Person(models.Model):
                             blank=True,
                             default='')
 
-    birth_date = models.DateField()
+    birth_date = models.DateField(null=True,
+                                  blank=True)
 
-    career = models.OneToOneField(Career,
-                                  on_delete=models.SET_NULL,
-                                  related_name='user_career',
-                                  primary_key=False,
-                                  null=True)
+    career = models.ForeignKey(Career,
+                               on_delete=models.SET_NULL,
+                               related_name='user_career',
+                               primary_key=False,
+                               null=True,
+                               unique=False)
 
     itn = models.TextField(null=True,
                            blank=True,
