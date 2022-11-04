@@ -40,6 +40,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'users.apps.UsersConfig',
+    'ideasLogic.apps.IdeaslogicConfig',
+    'messages_system.apps.messages_systemConfig'
 ]
 
 MIDDLEWARE = [
