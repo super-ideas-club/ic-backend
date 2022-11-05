@@ -32,7 +32,7 @@ def sign_up(request):
         country = form_data['country']
         city = form_data['city']
         birth_date = form_data['birth_date']  # TODO: do format like 29.10.2022 instead of 2022.10.29
-        career = Career.objects.filter(title=form_data['career'])[0]
+        career = Career.objects.get(title=form_data['career'])
 
         itn = form_data['itn']  # TODO: optional field
         user = User.objects.create_user(email, password)
@@ -41,9 +41,12 @@ def sign_up(request):
                                itn, avatar_link, patronymic)
         person.save()
 
+        user = authenticate(request, email=email, password=password)
+        login(request, user)
         return JsonResponse(status=status.HTTP_201_CREATED,
                             data={
-                                'message': 'Signup success'
+                                'message': 'Signup success',
+                                'user_data': serialize_person(person)
                             })
     return JsonResponse(status=status.HTTP_400_BAD_REQUEST,
                         data={
