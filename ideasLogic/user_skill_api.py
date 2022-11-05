@@ -90,9 +90,10 @@ class UserSkillMain(CreateAPIView):
 
         skill = UserSkill(name=name)
         skill.save()
-        skill.related_person.add(
-            Person.objects.get(pk=serializer.data.get('related_person')[0]))
-        skill.save()
+        if len(serializer.data.get('related_person')) > 0:
+            skill.related_person.add(
+                Person.objects.get(pk=serializer.data.get('related_person')[0]))
+            skill.save()
         return JsonResponse(status=status.HTTP_201_CREATED,
                             data={
                                 'message': 'Idea Saved',
