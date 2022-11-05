@@ -25,6 +25,13 @@ class IsOwned(permissions.BasePermission):
         return False
 
 
+class TeamsByUser(ListAPIView):
+    serializer_class = TeamSerializer
+
+    def get_queryset(self):
+        return Team.objects.filter(persons__pk=self.kwargs.get('user_id'))
+
+
 class TeamSerializerToEdit(serializers.ModelSerializer):
     class Meta:
         model = Team
@@ -77,7 +84,10 @@ class TeamApiEdit(DestroyAPIView, UpdateAPIView):
     queryset = Team.objects.all()
     permission_classes = (IsOwned, )
 
+
 urlpatterns = [
+    path('by-user/<int:user_id>/', TeamsByUser.as_view()),
     path('', TeamApi.as_view()),
-    path('<int:pk>', TeamApiEdit.as_view())
+    path('<int:pk>', TeamApiEdit.as_view()),
+
 ]
