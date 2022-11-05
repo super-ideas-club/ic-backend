@@ -90,7 +90,7 @@ class UserSkillMain(CreateAPIView):
 
         skill = UserSkill(name=name)
         skill.save()
-        if len(serializer.data.get('related_person')) > 0:
+        if not serializer.data.get('related_person') is None and len(serializer.data.get('related_person')) > 0:
             skill.related_person.add(
                 Person.objects.get(pk=serializer.data.get('related_person')[0]))
             skill.save()
