@@ -8,6 +8,7 @@ def serialize_person(person) -> Dict[str, Any]:
     user = User.objects.filter(pk=user_id)[0]
 
     return {
+        'user_id': user.pk,
         'email': user.email,
         # 'is_staff': user.is_staff,
         # 'is_active': user.is_active,
