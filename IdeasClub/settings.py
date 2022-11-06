@@ -65,6 +65,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'users.apps.UsersConfig',
+    'nlp.apps.NlpConfig',
     'ideasLogic.apps.IdeaslogicConfig',
     'messages_system.apps.messages_systemConfig'
 ]
