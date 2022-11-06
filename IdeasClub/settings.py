@@ -35,7 +35,9 @@ CORS_ALLOWED_ORIGINS = [
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'http://188.72.108.89:3000'
+    'http://188.72.108.89:3000',
+    'http://localhost:80',
+    'http://188.72.108.89:80'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
