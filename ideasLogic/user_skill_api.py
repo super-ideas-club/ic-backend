@@ -2,6 +2,7 @@ import json
 
 from django.http import JsonResponse
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import serializers, status, filters
 from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404, GenericAPIView
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
@@ -77,6 +78,7 @@ class UserSkillListByUser(ListAPIView):
 class UserSkillMain(CreateAPIView):
     """
     Работает
+
     """
     schema = AutoSchema(tags=["UserSkill"])
     serializer_class = UserSkillSerializer
@@ -94,10 +96,7 @@ class UserSkillMain(CreateAPIView):
             skill.related_person.add(
                 Person.objects.get(pk=serializer.data.get('related_person')[0]))
             skill.save()
-        return JsonResponse(status=status.HTTP_201_CREATED,
-                            data={
-                                'message': 'Idea Saved',
-                            })
+        return skill
 
 
 class AddSkillsToUser(GenericAPIView):

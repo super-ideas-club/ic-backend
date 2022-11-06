@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db.models import When
-from django.http import JsonResponse
-from rest_framework import serializers, status
+from rest_framework import serializers
 from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404, GenericAPIView, RetrieveAPIView, \
     DestroyAPIView, UpdateAPIView
 from rest_framework.schemas.openapi import AutoSchema
@@ -117,10 +116,30 @@ class IdeasList(ListAPIView):
         return query_set
 
 
+class IdeasByThemes(ListAPIView):
+    serializer_class = IdeaSerializer
+
+    def post(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        themes_ids = []
+        print(self.request.data)
+        if self.request.data['themes_ids']:
+            themes_ids = self.request.data['themes_ids']
+        print(themes_ids)
+        if len(themes_ids) == 0:
+            return Idea.objects.filter(hidden=False)
+
+        return Idea.objects.filter(themes__in=themes_ids, hidden=False).distinct()
+
+
+
 urlpatterns = [
     path('themes/all', IdeaThemeList.as_view(), name='idea_theme_all'),
     path('themes/create', IdeaThemeCreate.as_view(), name='create_idea_theme'),
     path('create', IdeaCreate.as_view()),
     path('list/<int:user_id>', IdeasList.as_view()),
-    path('<int:pk>', IdeaGetDelete.as_view())
+    path('<int:pk>', IdeaGetDelete.as_view()),
+    path('by-themes', IdeasByThemes.as_view()),
 ]

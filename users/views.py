@@ -122,5 +122,16 @@ def test_view(request):
                         })
 
 
-
+@csrf_exempt
+def get_user_info(request, user_pk):
+    if request.method == 'GET':
+        try:
+            person = Person.objects.get(pk=user_pk)
+            return JsonResponse(status=status.HTTP_200_OK,
+                                data=serialize_person(person))
+        except Person.DoesNotExist:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST,
+                                data={
+                                    'message': 'Bad request.'
+                                })
 
