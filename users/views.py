@@ -1,12 +1,10 @@
 from .models import Person, User, Career
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
-from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 from rest_framework import status
 from .serializers import serialize_person
-from django.core import serializers
 import json
 
 
@@ -23,18 +21,22 @@ def sign_up(request):
                                 data={
                                     'message': 'Email already taken!'
                                 })
-
-        avatar_link = form_data['avatar_link']  # TODO: optional field
+        avatar_link = ''
+        if form_data.get('avatar_link') is not None:
+            avatar_link = form_data['avatar_link']
         gender = form_data['gender']
         name = form_data['name']
         surname = form_data['surname']
-        patronymic = form_data['patronymic']  # TODO: optional field
+        patronymic = ''
+        if form_data.get('patronymic') is not None:
+            patronymic = form_data['patronymic']
         country = form_data['country']
         city = form_data['city']
         birth_date = form_data['birth_date']  # TODO: do format like 29.10.2022 instead of 2022.10.29
         career = Career.objects.get(title=form_data['career'])
-
-        itn = form_data['itn']  # TODO: optional field
+        itn = ''
+        if form_data.get('itn') is not None:
+            itn = form_data['itn']  # TODO: optional field
         user = User.objects.create_user(email, password)
         person = Person.create(user, gender, name, surname,
                                country, city, birth_date, career,
@@ -57,12 +59,8 @@ def sign_up(request):
 @ensure_csrf_cookie
 @csrf_exempt
 def sign_in(request):
-    print(request.method)
-    print(request.body)
-    print(request.body.decode())
     if request.method == 'POST':
         form_data = json.loads(request.body.decode())
-        print(form_data)
 
         email = form_data['email']
         password = form_data['password']
@@ -88,12 +86,9 @@ def sign_in(request):
 @xframe_options_exempt
 @csrf_exempt  # TODO: maybe change to @csrf_exempt if have no time
 def get_data(request):
-    print(request.method)
     if request.method == 'GET':
         user = request.user
-        print("alo")
         if user.is_authenticated:
-            print("alo2")
             person = Person.objects.filter(user=user)[0]
             return JsonResponse(status=status.HTTP_200_OK,
                                 data=serialize_person(person))  # TODO: fix serializer maybe
@@ -110,7 +105,6 @@ def get_data(request):
 @xframe_options_exempt
 @csrf_exempt
 def test_view(request):
-    print(request.method)
     if request.method == 'POST':
         return JsonResponse(status=status.HTTP_200_OK,
                             data={
