@@ -32,6 +32,20 @@ class IdeaSerializer(serializers.ModelSerializer):
         }
 
 
+class IdeaSerializerCreate(serializers.ModelSerializer):
+    class Meta:
+        model = Idea
+        fields = ('pk', 'short_name', 'description', 'state', 'themes', 'wanted_skills', 'hidden')
+        extra_kwargs = {
+            'state': {
+                'read_only': True
+            },
+            'pk': {
+                'read_only': True
+            }
+        }
+
+
 class IdeaThemeList(ListAPIView):
     """
     Работает
@@ -63,7 +77,7 @@ class IdeaCreate(CreateAPIView):
 
     """
     schema = AutoSchema(tags=["Idea"])
-    serializer_class = IdeaSerializer
+    serializer_class = IdeaSerializerCreate
     queryset = Idea.objects.all()
 
     def perform_create(self, serializer):
@@ -143,3 +157,4 @@ urlpatterns = [
     path('<int:pk>', IdeaGetDelete.as_view()),
     path('by-themes', IdeasByThemes.as_view()),
 ]
+
