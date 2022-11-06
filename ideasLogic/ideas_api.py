@@ -35,7 +35,7 @@ class IdeaSerializer(serializers.ModelSerializer):
 class IdeaSerializerCreate(serializers.ModelSerializer):
     class Meta:
         model = Idea
-        fields = ('pk', 'short_name', 'description', 'state', 'themes', 'wanted_skills', 'hidden')
+        fields = ('pk', 'short_name', 'description', 'state', 'themes', 'hidden')
         extra_kwargs = {
             'state': {
                 'read_only': True

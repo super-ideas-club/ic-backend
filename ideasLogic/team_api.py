@@ -4,13 +4,16 @@ from rest_framework.generics import ListAPIView, CreateAPIView, GenericAPIView, 
 from rest_framework.schemas.openapi import AutoSchema
 from django.urls import path
 from ideasLogic.models import Team, Idea
+from ideasLogic.user_skill_api import UserSkillSerializer
 from ideasLogic.utils import check_for_banned_words
 
 
 class TeamSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Team
-        fields = '__all__'
+        fields = ('persons', 'name', 'created_by', 'idea', 'description')
+
         extra_kwargs = {
             'created_by': {
                 'read_only': True
@@ -33,6 +36,8 @@ class TeamsByUser(ListAPIView):
 
 
 class TeamSerializerToEdit(serializers.ModelSerializer):
+
+
     class Meta:
         model = Team
         fields = '__all__'
